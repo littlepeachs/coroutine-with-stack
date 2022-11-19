@@ -18,7 +18,7 @@ void yield() {
   if (!g_pool->is_parallel) {
     // 从 g_pool 中获取当前协程状态
     auto context = g_pool->coroutines[g_pool->context_id];
-
+    coroutine_switch(context->callee_registers, context->caller_registers);
     // 调用 coroutine_switch 切换到 coroutine_pool 上下文
   }
 }
@@ -47,5 +47,10 @@ void sleep(uint64_t ms) {
     // ready_func：检查当前时间，如果已经超时，则返回 true
 
     // 调用 coroutine_switch 切换到 coroutine_pool 上下文
+    auto cur = get_time();
+    auto context = g_pool->coroutines[g_pool->context_id];
+    context->ready = false;
+    context->ready_func = [=]()->bool{return std::chrono::duration_cast<std::chrono::milliseconds>(get_time() - cur).count() > ms;};
+    coroutine_switch(context->callee_registers, context->caller_registers);
   }
 }

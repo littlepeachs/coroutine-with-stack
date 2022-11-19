@@ -19,6 +19,8 @@ void lookup_coroutine(const uint32_t *table, size_t size, uint32_t value,
     // TODO: Task 3
     // 使用 __builtin_prefetch 预取容易产生缓存缺失的内存
     // 并调用 yield
+    __builtin_prefetch(&table[probe]);
+    yield();
 
     uint32_t v = table[probe];
     if (v <= value) {
@@ -106,8 +108,8 @@ uint32_t *coroutine_batched(int m, int n, int batch, size_t log2_bytes,
 
 int main(int argc, char *argv[]) {
   // 4 GiB
-  size_t log2_bytes = 32;
-  int m = 1000000;
+  size_t log2_bytes = 32; //32
+  int m = 1000000; //1000000
   int batch = 16;
 
   int opt;
